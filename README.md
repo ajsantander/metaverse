@@ -23,3 +23,7 @@ query {
 }
 ```
 * Call from JS: https://medium.com/@stubailo/how-to-call-a-graphql-server-with-axios-337a94ad6cf9
+
+## Other resources
+* Skybox generator: https://github.com/wwwtyro/space-3d
+

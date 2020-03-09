@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "copy-assets": "cp -R assets/* build/",
     "start": "npm run watch & npm run serve",
     "serve": "parcel serve src/index.html --port 3000 --out-dir build",
     "build": "parcel build src/index.html --out-dir build",
