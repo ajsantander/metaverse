@@ -1,0 +1,19 @@
+{
+  "name": "metaverse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run watch & npm run serve",
+    "serve": "parcel serve src/index.html --port 3000 --out-dir build",
+    "build": "parcel build src/index.html --out-dir build",
+    "watch": "parcel watch src/index.html --out-dir build --no-cache"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.114.0",
+    "parcel-bundler": "1.9.7"
+  }
+}
