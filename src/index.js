@@ -1,19 +1,57 @@
+import axios from 'axios'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+let data
 let scene, renderer
 let camera, cameraControls
 
-function init() {
+async function main() {
+  await fetchData()
+
+  initEngine()
+
+  buildScene()
+
+  renderLoop()
+}
+
+async function fetchData() {
+  const query = `query {
+  organisations(take: 30, sort: { score: DESC }) {
+    nodes {
+      ens
+      address
+      score
+      aum
+      ant
+      activity
+    }
+  }
+}`
+
+  const rawResponse = await fetch('https://daolist.1hive.org', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  })
+
+  const response = await rawResponse.json()
+
+  data = response.data
+}
+
+function initEngine() {
   scene = new THREE.Scene()
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
 
-  scene.add(new THREE.AmbientLight(0xffffff, 0.1))
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
+  scene.add(ambientLight)
 
-  const light = new THREE.PointLight(0xffffff, 1, 100)
-  light.position.set(50, 50, 50)
-  scene.add(light)
+  const pointLight = new THREE.PointLight(0xffffff, 1, 100)
+  pointLight.position.set(50, 50, 50)
+  scene.add(pointLight)
 
   renderer = new THREE.WebGLRenderer()
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -29,15 +67,44 @@ function init() {
   document.body.appendChild(renderer.domElement)
 }
 
-function buildSampleScene() {
-  const geometry = new THREE.SphereGeometry()
+function addNode(position, radius) {
+  const geometry = new THREE.SphereGeometry(radius, 12, 12)
 
-  // const material = new THREE.MeshBasicMaterial({ color: 0x0000FF })
-  const material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, specular: 0xFFFFFF, shininess: 30, flatShading: false })
+  const material = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    specular: 0xffffff,
+    shininess: 30,
+    flatShading: false
+  })
 
-  const cube = new THREE.Mesh(geometry, material)
+  const sphere = new THREE.Mesh(geometry, material)
+  sphere.position.set(...position)
 
-  scene.add(cube);
+  scene.add(sphere);
+}
+
+function randomNum(min, max) {
+  return (max - min) * Math.random() + min
+}
+
+function randomPos(min, max) {
+  return [
+    randomNum(min, max),
+    randomNum(min, max),
+    randomNum(min, max)
+  ]
+}
+
+function buildScene() {
+  const posMin = -5
+  const posMax = 5
+  const radiusMultiplier = 3
+
+  for (const node of data.organisations.nodes) {
+    console.log(`node`, node)
+
+    addNode(randomPos(posMin, posMax), radiusMultiplier * node.score)
+  }
 }
 
 function renderLoop() {
@@ -48,6 +115,4 @@ function renderLoop() {
 	renderer.render(scene, camera)
 }
 
-init()
-buildSampleScene()
-renderLoop()
+main()
